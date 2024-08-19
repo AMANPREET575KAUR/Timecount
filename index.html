@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stopwatch</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            text-align: center;
+            border: 1px solid #fff;
+            padding: 20px;
+            border-radius: 10px;
+            background: #333;
+        }
+        #time {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #start-btn {
+            background-color: green;
+            color: white;
+        }
+        #lap-btn {
+            background-color: blue;
+            color: white;
+        }
+        #start-btn.stop {
+            background-color: red;
+        }
+        #lap-btn.reset {
+            background-color: gray;
+        }
+        #laps {
+            list-style-type: none;
+            padding: 0;
+        }
+        #laps li {
+            background: #444;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <label id="time">00:00:00</label>
+        <br>
+        <button id="start-btn">Start</button>
+        <button id="lap-btn">Lap</button>
+        <ul id="laps"></ul>
+    </div>
+
+    <script>
+        let timerInterval;
+        let isRunning = false;
+        let startTime;
+        let elapsedTime = 0;
+
+        const timeLabel = document.getElementById('time');
+        const startButton = document.getElementById('start-btn');
+        const lapButton = document.getElementById('lap-btn');
+        const lapsList = document.getElementById('laps');
+
+        function formatTime(ms) {
+            const date = new Date(ms);
+            return date.toISOString().substr(11, 8);
+        }
+
+        function updateTime() {
+            elapsedTime = Date.now() - startTime;
+            timeLabel.textContent = formatTime(elapsedTime);
+        }
+
+        function startTimer() {
+            startTime = Date.now() - elapsedTime;
+            timerInterval = setInterval(updateTime, 1000);
+            isRunning = true;
+            startButton.textContent = 'Stop';
+            startButton.classList.add('stop');
+            lapButton.textContent = 'Lap';
+            lapButton.classList.remove('reset');
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            startButton.textContent = 'Start';
+            startButton.classList.remove('stop');
+            lapButton.textContent = 'Reset';
+            lapButton.classList.add('reset');
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            elapsedTime = 0;
+            timeLabel.textContent = formatTime(elapsedTime);
+            isRunning = false;
+            startButton.textContent = 'Start';
+            startButton.classList.remove('stop');
+            lapButton.textContent = 'Lap';
+            lapButton.classList.remove('reset');
+        }
+
+        function addLap() {
+            const lapItem = document.createElement('li');
+            lapItem.textContent = formatTime(elapsedTime);
+            lapsList.prepend(lapItem);
+        }
+
+        startButton.addEventListener('click', () => {
+            if (isRunning) {
+                stopTimer();
+            } else {
+                startTimer();
+            }
+        });
+
+        lapButton.addEventListener('click', () => {
+            if (isRunning) {
+                addLap();
+            } else {
+                resetTimer();
+            }
+        });
+    </script>
+</body>
+</html>
